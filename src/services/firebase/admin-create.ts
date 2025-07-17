@@ -54,6 +54,7 @@ export async function createOrganisation({
             id: orgRef.id,
             name,
             ownerId,
+            subscription: "free",
             members: 1,
             stripeCustomerId,
             createdAt: now,

@@ -21,6 +21,8 @@ export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"form">) {
+    const root = process.env.NEXT_PUBLIC_DASH_ROOT as string;
+    
     const [isClient, setIsClient] = useState(false);
     const router = useRouter();
 
@@ -77,7 +79,7 @@ export function LoginForm({
                 if (userData.authentication?.onboarding) {
                     router.push("/onboarding")
                 } else {
-                    router.push(`https://app.salkaro.com`);
+                    router.push(root);
                 }
             }
         } catch (e) {

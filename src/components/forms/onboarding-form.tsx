@@ -12,6 +12,8 @@ import { updateOnboarding } from "@/services/firebase/update";
 import { Loader2Icon } from "lucide-react";
 
 const OnboardingForm = () => {
+    const root = process.env.NEXT_PUBLIC_DASH_ROOT as string;
+
     const { data: session, status } = useSession();
     const toastShownRef = useRef(false);
 
@@ -44,7 +46,7 @@ const OnboardingForm = () => {
                 await updateOnboarding({ firstname: firstName, lastname: lastName, organisation: orgName })
             }
             toast.success("Onboarding complete!");
-            router.push("https://app.salkaro.com")
+            router.push(root)
         } else {
             setStage(stage + 1);
         }
