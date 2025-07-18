@@ -10,6 +10,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { updateOnboarding } from "@/services/firebase/update";
 import { Loader2Icon } from "lucide-react";
+import { joinOrganisationAdmin } from "@/services/firebase/admin-update";
 
 const OnboardingForm = () => {
     const root = process.env.NEXT_PUBLIC_DASH_ROOT as string;
@@ -23,30 +24,55 @@ const OnboardingForm = () => {
     const [stage, setStage] = useState(0);
 
     // Stage 0: User info
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
+    const [firstname, setFirstname] = useState("");
+    const [lastname, setLastname] = useState("");
 
-    // Stage 1: Org info
+    // Stage 1: Org action choice
+    const [orgAction, setOrgAction] = useState<"create" | "join">("create")
+    // Create
     const [orgName, setOrgName] = useState("");
+    // Join
+    const [joinCode, setJoinCode] = useState("")
 
     const handleNextStage = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (stage === 0 && (!firstName || !lastName)) {
+        if (stage === 0 && (!firstname || !lastname)) {
             toast.error("Please enter your first and last name.");
-            return;
-        }
-        if (stage === 1 && !orgName) {
-            toast.error("Please enter your organisation name.");
             return;
         }
 
         if (stage === 1) {
-            setLoading(true);
-            if (session?.user.authentication?.onboarding) {
-                await updateOnboarding({ firstname: firstName, lastname: lastName, organisation: orgName })
+            if (orgAction === "create" && !orgName.trim()) {
+                return
             }
-            toast.success("Onboarding complete!");
-            router.push(root)
+            if (orgAction === "join" && !joinCode.trim()) {
+                return
+            }
+        }
+
+        // Final submission
+        if (stage === 1) {
+            setLoading(true)
+            try {
+                if (orgAction === "create") {
+                    await updateOnboarding({
+                        firstname,
+                        lastname,
+                        organisation: orgName,
+                    })
+                    toast.success("Organisation created and onboarding complete!")
+                } else {
+                    const { error } = await joinOrganisationAdmin({ code: joinCode.trim(), uid: session?.user.id as string, firstname, lastname })
+                    if (error) throw error;
+                    toast.success("Joined organisation successfully!")
+                }
+                router.push(`${root}/preparing`)
+            } catch (err) {
+                console.log(err)
+                toast.error("Something went wrong, please try again.", { description: "Organisation may not exists or invite code is invalid" })
+            } finally {
+                setLoading(false)
+            }
         } else {
             setStage(stage + 1);
         }
@@ -98,37 +124,73 @@ const OnboardingForm = () => {
                     <div className="space-y-4">
                         <div className="grid gap-3">
                             <Label htmlFor="firstname">First Name</Label>
-                            <Input id="firstname" value={firstName} type="text" placeholder="John" required onChange={(e) => setFirstName(e.target.value)} />
+                            <Input id="firstname" value={firstname} type="text" placeholder="John" required onChange={(e) => setFirstname(e.target.value)} />
                         </div>
                         <div className="grid gap-3">
                             <Label htmlFor="lastname">Last Name</Label>
-                            <Input id="lastname" value={lastName} type="text" placeholder="Smith" required onChange={(e) => setLastName(e.target.value)} />
+                            <Input id="lastname" value={lastname} type="text" placeholder="Smith" required onChange={(e) => setLastname(e.target.value)} />
                         </div>
                     </div>
-                    <Button className="w-full mt-4" type="submit" disabled={!firstName || !lastName}>
+                    <Button className="w-full mt-4" type="submit" disabled={!firstname || !lastname}>
                         Continue
                     </Button>
                 </form>
             )}
 
             {stage === 1 && (
-                <form className="space-y-6" onSubmit={handleNextStage}>
-                    <h1 className="text-2xl font-bold mb-6">Create your organisation</h1>
-                    <div className="space-y-4">
-                        <div className="grid gap-3">
-                            <Label htmlFor="organisation">Organisation Name</Label>
-                            <Input id="organisation" value={orgName} type="text" placeholder="Acme Inc." required onChange={(e) => setOrgName(e.target.value)} />
+                <form onSubmit={handleNextStage} className="space-y-6">
+                    <h1 className="text-2xl font-bold mb-4">Organisation</h1>
+
+                    {/* Action toggle */}
+                    <div className="flex space-x-4 justify-center">
+                        <Button
+                            variant={orgAction === "create" ? "default" : "ghost"}
+                            onClick={() => setOrgAction("create")}
+                        >
+                            Create New
+                        </Button>
+                        <Button
+                            variant={orgAction === "join" ? "default" : "ghost"}
+                            onClick={() => setOrgAction("join")}
+                        >
+                            Join Existing
+                        </Button>
+                    </div>
+
+                    {orgAction === "create" ? (
+                        <div className="space-y-4">
+                            <div className="grid gap-3">
+                                <Label htmlFor="organisation">Organisation Name</Label>
+                                <Input
+                                    id="organisation"
+                                    value={orgName}
+                                    onChange={(e) => setOrgName(e.target.value)}
+                                    placeholder="Salkaro Inc."
+                                />
+                            </div>
                         </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="grid gap-3">
+                                <Label htmlFor="joinCode">Join Code</Label>
+                                <Input
+                                    id="joinCode"
+                                    value={joinCode}
+                                    onChange={(e) => setJoinCode(e.target.value)}
+                                    placeholder="e.g. AbCd1234"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex justify-between">
                         <Button variant="link" onClick={handlePreviousStage}>
                             Go Back
                         </Button>
+                        <Button className="w-32" type="submit" disabled={loading}>
+                            {loading ? <Loader2Icon className="animate-spin" /> : orgAction === "create" ? "Create" : "Join"}
+                        </Button>
                     </div>
-                    <Button className="w-full" type="submit" disabled={loading || !orgName}>
-                        {loading && (
-                            <Loader2Icon className="animate-spin" />
-                        )}
-                        Finish Onboarding
-                    </Button>
                 </form>
             )}
         </div>

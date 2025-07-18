@@ -15,7 +15,7 @@ import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/
 import { useEffect, useRef, useState } from "react"
 import { IoMdEye, IoMdEyeOff } from "react-icons/io"
 import { FaRegCheckCircle } from "react-icons/fa"
-import { doc, setDoc } from "firebase/firestore"
+import { doc, updateDoc } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 import PreparingForm from "./preparing-form"
 import { signIn } from "next-auth/react"
@@ -139,11 +139,10 @@ export function SignUpForm({
                     }
 
                     try {
-                        await setDoc(doc(firestore, usersCol, auth.currentUser.uid), {
-                            authentication: {
-                                onboarding: true,
-                            }
-                        }, { merge: true });
+                        await updateDoc(
+                            doc(firestore, usersCol, auth.currentUser.uid),
+                            { 'authentication.onboarding': true }
+                        );
                     } catch (error) {
                         console.error("Error setting onboarding: ", error)
                     }

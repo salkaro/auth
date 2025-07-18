@@ -79,7 +79,7 @@ export function LoginForm({
                 if (userData.authentication?.onboarding) {
                     router.push("/onboarding")
                 } else {
-                    router.push(root);
+                    router.push(`${root}/preparing`);
                 }
             }
         } catch (e) {

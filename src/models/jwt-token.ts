@@ -5,6 +5,7 @@ interface IJwtToken extends JWT {
     id: string;
     email: string;
     user: IUser;
+    firebaseToken: string;
 }
 
 

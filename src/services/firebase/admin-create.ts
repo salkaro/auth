@@ -2,12 +2,21 @@
 
 // Local Imports
 import { IUser } from "@/models/user";
-import { firestoreAdmin } from "@/lib/firebase/config-admin";
+import { admin, firestoreAdmin } from "@/lib/firebase/config-admin";
 import { organisationsCol, usersCol } from "@/utils/constants";
 import { IOrganisation } from "@/models/organisation";
 import { createStripeCustomer } from "../stripe/create";
 
 // External Imports
+
+
+export async function createCustomToken({ uid }: { uid: string }): Promise<{ token?: string, error?: string }> {
+    try {
+        return { token: await admin.auth().createCustomToken(uid) };
+    } catch (error) {
+        return { error: `${error}` }
+    }
+}
 
 export async function createUser({ uid, email }: { uid: string, email: string }): Promise<IUser | void> {
     try {
