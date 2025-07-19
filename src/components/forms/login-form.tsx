@@ -16,13 +16,14 @@ import { Loader2Icon } from "lucide-react"
 import { IUser } from "@/models/user"
 import { doc, getDoc } from "firebase/firestore"
 import { usersCol } from "@/utils/constants"
+import { createSignInToken } from "@/services/firebase/create"
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"form">) {
     const root = process.env.NEXT_PUBLIC_DASH_ROOT as string;
-    
+
     const [isClient, setIsClient] = useState(false);
     const router = useRouter();
 
@@ -79,6 +80,7 @@ export function LoginForm({
                 if (userData.authentication?.onboarding) {
                     router.push("/onboarding")
                 } else {
+                    await createSignInToken({ uid: auth.currentUser?.uid as string })
                     router.push(`${root}/preparing`);
                 }
             }

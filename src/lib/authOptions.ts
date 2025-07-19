@@ -9,7 +9,6 @@ import { retrieveUserAndCreate } from "@/services/firebase/retrieve";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
-import { createCustomToken } from "@/services/firebase/admin-create";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -60,13 +59,6 @@ export const authOptions: NextAuthOptions = {
                 token.id = user.id;
                 token.email = user.email;
                 try {
-                    const { token: firebaseToken, error } = await createCustomToken({ uid: user.id });
-                    if (error) throw error;
-                    token.firebaseToken = firebaseToken as string;
-                } catch (error) {
-                    console.error('Error creating custom token (jwt):', error);
-                }
-                try {
                     const userDoc = (await retrieveUserAndCreate({ uid: user.id, email: user.email }) ?? {}) as IUser;
                     token.user = userDoc;
                 } catch (error) {
@@ -76,15 +68,12 @@ export const authOptions: NextAuthOptions = {
             return token;
         },
         async session({ session, token }) {
-            const { user, firebaseToken } = token as IJwtToken;
+            const { user } = token as IJwtToken;
             try {
                 if (!user.id) return session;
                 const userDoc = await retrieveUserAdmin({ uid: user.id }) as IUser;
                 if (userDoc) {
                     session.user = userDoc as IUser;
-                }
-                if (firebaseToken) {
-                    session.firebaseToken = firebaseToken as string;
                 }
             } catch (error) {
                 console.error('Error retrieving user (session):', error);

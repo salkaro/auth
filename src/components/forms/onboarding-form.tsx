@@ -11,6 +11,8 @@ import { Label } from "../ui/label";
 import { updateOnboarding } from "@/services/firebase/update";
 import { Loader2Icon } from "lucide-react";
 import { joinOrganisationAdmin } from "@/services/firebase/admin-update";
+import { createSignInToken } from "@/services/firebase/create";
+import { auth } from "@/lib/firebase/config";
 
 const OnboardingForm = () => {
     const root = process.env.NEXT_PUBLIC_DASH_ROOT as string;
@@ -66,6 +68,8 @@ const OnboardingForm = () => {
                     if (error) throw error;
                     toast.success("Joined organisation successfully!")
                 }
+
+                await createSignInToken({ uid: auth.currentUser?.uid as string })
                 router.push(`${root}/preparing`)
             } catch (err) {
                 console.log(err)

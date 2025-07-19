@@ -2,12 +2,12 @@
 
 // Local Imports
 import { cn } from "@/lib/utils"
-import { auth, firestore } from "@/lib/firebase/config"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { usersCol } from "@/utils/constants"
 import LoadingSpinner from "../ui/spinner"
+import { auth, firestore } from "@/lib/firebase/config"
 import { validateEmail, validateEmailInput, validatePasswordInput } from "@/utils/input-validation"
 
 // External Imports
