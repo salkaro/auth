@@ -12,6 +12,7 @@ import { NextAuthOptions } from "next-auth";
 import { createCustomToken } from "@/services/firebase/admin-create";
 
 const isProd = process.env.NODE_ENV === "production";
+const domain = ".salkaro.com"
 
 export const authOptions: NextAuthOptions = {
     cookies: {
@@ -22,7 +23,7 @@ export const authOptions: NextAuthOptions = {
                 sameSite: "lax",
                 path: "/",
                 secure: isProd,
-                domain: isProd ? ".salkaro.com" : undefined,
+                domain: isProd ? domain : undefined,
             },
         },
         callbackUrl: {
@@ -31,7 +32,7 @@ export const authOptions: NextAuthOptions = {
                 sameSite: "lax",
                 path: "/",
                 secure: isProd,
-                domain: isProd ? ".salkaro.com" : undefined,
+                domain: isProd ? domain : undefined,
             },
         },
         csrfToken: {
@@ -41,7 +42,7 @@ export const authOptions: NextAuthOptions = {
                 sameSite: "lax",
                 path: "/",
                 secure: isProd,
-                domain: isProd ? ".salkaro.com" : undefined,
+                domain: isProd ? domain : undefined,
             },
         },
         pkceCodeVerifier: {
@@ -51,7 +52,7 @@ export const authOptions: NextAuthOptions = {
                 sameSite: "lax",
                 path: "/",
                 secure: isProd,
-                domain: isProd ? ".salkaro.com" : undefined,
+                domain: isProd ? domain : undefined,
                 maxAge: 900,
             },
         },
@@ -62,18 +63,18 @@ export const authOptions: NextAuthOptions = {
                 sameSite: "lax",
                 path: "/",
                 secure: isProd,
-                domain: isProd ? ".salkaro.com" : undefined,
+                domain: isProd ? domain : undefined,
                 maxAge: 900,
             },
         },
         nonce: {
-            name: isProd ? "__Secure-next-auth.nonce" : "next-auth.nonce",
+            name: isProd ? domain : "next-auth.nonce",
             options: {
                 httpOnly: true,
                 sameSite: "lax",
                 path: "/",
                 secure: isProd,
-                domain: isProd ? ".salkaro.com" : undefined,
+                domain: isProd ? domain : undefined,
             },
         },
     },
