@@ -1,14 +1,15 @@
 "use client";
 
-import { firestore } from "@/lib/firebase/config";
+// Local Imports
 import { usersCol } from "@/utils/constants";
-import { getAuth } from "firebase/auth";
-import { deleteField, doc, updateDoc } from "firebase/firestore";
 import { createOrganisation } from "./admin-create";
+
+// External Imports
+import { deleteField, doc, updateDoc } from "firebase/firestore";
+import { auth, firestore } from "@/lib/firebase/config";
 
 export async function updateOnboarding({ firstname, lastname, organisation }: { firstname: string, lastname: string, organisation: string }) {
     try {
-        const auth = getAuth();
         const user = auth.currentUser;
 
         if (!user || !user.email) {

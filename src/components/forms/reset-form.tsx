@@ -7,13 +7,15 @@ import { Label } from "@/components/ui/label"
 import { useEffect, useState } from "react"
 import { validateEmail, validateEmailInput } from "@/utils/input-validation"
 import PreparingForm from "./preparing-form"
+import { resetPassword } from "@/services/firebase/admin-reset"
+import { toast } from "sonner"
 
 export function ResetForm({
     className,
     ...props
 }: React.ComponentProps<"form">) {
     const [isClient, setIsClient] = useState(false);
-    
+
     // Inputs
     const [email, setEmail] = useState<string>("");
 
@@ -33,8 +35,23 @@ export function ResetForm({
         validateEmail(value, setEmail);
     }
 
-    function handleSubmit() {
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
         setLoading(true);
+
+        try {
+            const { success, message } = await resetPassword(email);
+
+            if (success) {
+                toast(message, { description: "Be sure to check your spam" });
+            } else {
+                toast(message || 'Something went wrong', { description: "Please try again" });
+            }
+        } catch {
+
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -45,7 +62,6 @@ export function ResetForm({
         // Render a fallback placeholder during SSR
         return <PreparingForm />
     }
-
 
 
     return (

@@ -194,7 +194,8 @@ const OnboardingForm = () => {
                             Go Back
                         </Button>
                         <Button className="w-32" type="submit" disabled={loading}>
-                            {loading ? <Loader2Icon className="animate-spin" /> : orgAction === "create" ? "Create" : "Join"}
+                            {loading && <Loader2Icon className="animate-spin" />}
+                            {loading ? orgAction === "create" ? "Creating" : "Joining" : orgAction === "create" ? "Create" : "Join"}
                         </Button>
                     </div>
                 </form>
