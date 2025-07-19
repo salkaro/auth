@@ -69,8 +69,10 @@ const OnboardingForm = () => {
                     toast.success("Joined organisation successfully!")
                 }
 
-                await createSignInToken({ uid: auth.currentUser?.uid as string })
-                router.push(`${root}/preparing`)
+                const token = await createSignInToken({ uid: auth.currentUser?.uid as string })
+                const isProd = process.env.NODE_ENV === 'production';
+                document.cookie = `signInToken=${token}; path=/;${isProd ? ' domain=.salkaro.com;' : ''} max-age=300;${isProd ? ' secure;' : ''} samesite=Lax`;
+                router.push(`${root}/preparing`);
             } catch (err) {
                 console.log(err)
                 toast.error("Something went wrong, please try again.", { description: "Organisation may not exists or invite code is invalid" })

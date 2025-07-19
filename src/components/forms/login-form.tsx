@@ -1,22 +1,27 @@
 "use client"
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+// External Imports
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { Loader2Icon } from "lucide-react"
+import { doc, getDoc } from "firebase/firestore"
 import { IoMdEye, IoMdEyeOff } from "react-icons/io"
 import { useEffect, useState } from "react"
 import { signInWithEmailAndPassword as firebaseSignIn } from "firebase/auth";
+
+// Local Imports
 import { validateEmail, validateEmailInput, validatePasswordInput } from "@/utils/input-validation"
-import PreparingForm from "./preparing-form"
-import { signIn } from "next-auth/react"
-import { auth, firestore } from "@/lib/firebase/config"
-import { useRouter } from "next/navigation"
-import { Loader2Icon } from "lucide-react"
-import { IUser } from "@/models/user"
-import { doc, getDoc } from "firebase/firestore"
-import { usersCol } from "@/utils/constants"
 import { createSignInToken } from "@/services/firebase/create"
+import { auth, firestore } from "@/lib/firebase/config"
+import PreparingForm from "./preparing-form"
+import { usersCol } from "@/utils/constants"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { IUser } from "@/models/user"
+import { cn } from "@/lib/utils"
+
+
 
 export function LoginForm({
     className,
@@ -80,7 +85,9 @@ export function LoginForm({
                 if (userData.authentication?.onboarding) {
                     router.push("/onboarding")
                 } else {
-                    await createSignInToken({ uid: auth.currentUser?.uid as string })
+                    const token = await createSignInToken({ uid: auth.currentUser?.uid as string })
+                    const isProd = process.env.NODE_ENV === 'production';
+                    document.cookie = `signInToken=${token}; path=/;${isProd ? ' domain=.salkaro.com;' : ''} max-age=300;${isProd ? ' secure;' : ''} samesite=Lax`;
                     router.push(`${root}/preparing`);
                 }
             }
