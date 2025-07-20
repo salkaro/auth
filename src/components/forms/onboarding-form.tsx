@@ -13,6 +13,7 @@ import { Loader2Icon } from "lucide-react";
 import { joinOrganisationAdmin } from "@/services/firebase/admin-update";
 import { createSignInToken } from "@/services/firebase/create";
 import { auth } from "@/lib/firebase/config";
+import { signOut } from "@/services/sign-out";
 
 const OnboardingForm = () => {
     const root = process.env.NEXT_PUBLIC_DASH_ROOT as string;
@@ -68,6 +69,13 @@ const OnboardingForm = () => {
                     if (error) throw error;
                     toast.success("Joined organisation successfully!")
                 }
+
+                // Sign out from any current sessions
+                let redirectToSignOut = false;
+                if (auth.currentUser?.email && (auth.currentUser?.email !== session?.user.email)) {
+                    redirectToSignOut = true;
+                }
+                await signOut({ redirectToSignOut })
 
                 const token = await createSignInToken({ uid: auth.currentUser?.uid as string })
                 const isProd = process.env.NODE_ENV === 'production';

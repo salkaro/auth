@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { IUser } from "@/models/user"
 import { cn } from "@/lib/utils"
+import { signOut } from "@/services/sign-out"
 
 
 
@@ -68,8 +69,16 @@ export function LoginForm({
     }
 
     async function handleLogin() {
+        setLoading(true);
+        // Sign out from any current sessions (if emails don't match then user needs to sign out of a previous account)
+        let redirectToSignOut = false;
+        if (auth.currentUser?.email && (auth.currentUser?.email !== email)) {
+            redirectToSignOut = true;
+        }
+        await signOut({ redirectToSignOut });
+
         try {
-            setLoading(true);
+            console.log(auth)
             const result = await signIn("credentials", {
                 email,
                 password,
