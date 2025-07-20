@@ -6,7 +6,7 @@ import { auth, firestore } from "@/lib/firebase/config";
 import { createOrganisation } from "./admin-create";
 
 // External Imports
-import { deleteField, doc, updateDoc } from "firebase/firestore";
+import { deleteField, doc, FieldValue, updateDoc } from "firebase/firestore";
 
 export async function updateOnboarding({ firstname, lastname, organisation }: { firstname: string, lastname: string, organisation?: string }) {
     try {
@@ -19,7 +19,7 @@ export async function updateOnboarding({ firstname, lastname, organisation }: { 
 
         const userRef = doc(firestore, usersCol, user.uid);
 
-        const updatePayload: Record<string, unknown> = {
+        const updatePayload: { [x: string]: FieldValue | Partial<unknown> | undefined; } = {
             firstname,
             lastname,
             "authentication.onboarding": deleteField(),
