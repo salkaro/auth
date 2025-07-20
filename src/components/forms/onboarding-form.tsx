@@ -30,7 +30,7 @@ const OnboardingForm = () => {
     const [lastname, setLastname] = useState("");
 
     // Stage 1: Org action choice
-    const [orgAction, setOrgAction] = useState<"create" | "join">("create")
+    const [orgAction, setOrgAction] = useState<"create" | "join" | "skip">("create")
     // Create
     const [orgName, setOrgName] = useState("");
     // Join
@@ -56,14 +56,14 @@ const OnboardingForm = () => {
         if (stage === 1) {
             setLoading(true)
             try {
-                if (orgAction === "create") {
+                if (orgAction === "create" || orgAction === "skip") {
                     await updateOnboarding({
                         firstname,
                         lastname,
-                        organisation: orgName,
+                        organisation: orgAction === "skip" ? undefined : orgName,
                     })
-                    toast.success("Organisation created and onboarding complete!")
-                } else {
+                    toast.success(orgAction === "skip" ? "Skipping organisation for now, onboarding complete!" : "Organisation created and onboarding complete!")
+                } else if (orgAction === "join") {
                     const { error } = await joinOrganisationAdmin({ code: joinCode.trim(), uid: session?.user.id as string, firstname, lastname })
                     if (error) throw error;
                     toast.success("Joined organisation successfully!")
@@ -194,8 +194,14 @@ const OnboardingForm = () => {
                             Go Back
                         </Button>
                         <Button className="w-32" type="submit" disabled={loading}>
-                            {loading && <Loader2Icon className="animate-spin" />}
-                            {loading ? orgAction === "create" ? "Creating" : "Joining" : orgAction === "create" ? "Create" : "Join"}
+                            {(loading && orgAction === "create") && <Loader2Icon className="animate-spin" />}
+                            {(loading && (orgAction === "create" || orgAction === "join")) ? orgAction === "create" ? "Creating" : "Joining" : orgAction === "create" ? "Create" : "Join"}
+                        </Button>
+                    </div>
+                    <div className="flex justify-end">
+                        <Button variant="link" onClick={() => setOrgAction("skip")}>
+                            {(loading && orgAction === "skip") && <Loader2Icon className="animate-spin" />}
+                            Skip for now
                         </Button>
                     </div>
                 </form>

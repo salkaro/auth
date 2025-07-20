@@ -4,6 +4,8 @@ export type EmailVerification = "unverified" | "verifying" | "verified";
 
 
 interface IUser {
+    firstname?: string | null;
+    lastname?: string | null;
     authentication?: IAuthentication | null;
     email?: string | null;
     id?: string | null;

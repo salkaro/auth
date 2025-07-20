@@ -2,13 +2,13 @@
 
 // Local Imports
 import { usersCol } from "@/utils/constants";
+import { auth, firestore } from "@/lib/firebase/config";
 import { createOrganisation } from "./admin-create";
 
 // External Imports
 import { deleteField, doc, updateDoc } from "firebase/firestore";
-import { auth, firestore } from "@/lib/firebase/config";
 
-export async function updateOnboarding({ firstname, lastname, organisation }: { firstname: string, lastname: string, organisation: string }) {
+export async function updateOnboarding({ firstname, lastname, organisation }: { firstname: string, lastname: string, organisation?: string }) {
     try {
         const user = auth.currentUser;
 
@@ -16,22 +16,33 @@ export async function updateOnboarding({ firstname, lastname, organisation }: { 
             throw new Error("No authenticated user found.");
         }
 
-        const { org, error } = await createOrganisation({ name: organisation, ownerId: user.uid, email: user.email })
-        if (error || !org) throw error;
 
         const userRef = doc(firestore, usersCol, user.uid);
 
-        await updateDoc(userRef, {
+        const updatePayload: Record<string, unknown> = {
             firstname,
             lastname,
-            organisation: {
+            "authentication.onboarding": deleteField(),
+        }
+
+
+        if (organisation) {
+            const { org, error } = await createOrganisation({
+                name: organisation,
+                ownerId: user.uid,
+                email: user.email,
+            })
+
+            if (error || !org) throw error
+
+            updatePayload.organisation = {
                 id: org.id,
                 role: "owner",
                 joinedAt: org.createdAt,
-            },
-            "authentication.onboarding": deleteField(),
-          });
+            }
+        }
 
+        await updateDoc(userRef, updatePayload);
     } catch (error) {
         console.error("Failed to update onboarding info:", error);
         throw error;
