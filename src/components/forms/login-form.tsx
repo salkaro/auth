@@ -2,7 +2,7 @@
 
 // External Imports
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2Icon } from "lucide-react"
 import { doc, getDoc } from "firebase/firestore"
 import { IoMdEye, IoMdEyeOff } from "react-icons/io"
@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label"
 import { IUser } from "@/models/user"
 import { cn } from "@/lib/utils"
 import { signOut } from "@/services/sign-out"
+import { toast } from "sonner"
 
 
 
@@ -29,6 +30,8 @@ export function LoginForm({
     ...props
 }: React.ComponentProps<"form">) {
     const root = process.env.NEXT_PUBLIC_DASH_ROOT as string;
+
+    const searchParams = useSearchParams();
 
     const [isClient, setIsClient] = useState(false);
     const router = useRouter();
@@ -111,6 +114,14 @@ export function LoginForm({
     useEffect(() => {
         setIsClient(true);
     }, []);
+
+    useEffect(() => {
+        const accountCreated = searchParams.get("account-created");
+
+        if (accountCreated === "true") {
+            toast.success("Account created successfully. Please log in.");
+        }
+    }, [searchParams]);
 
     if (!isClient) {
         // Render a fallback placeholder during SSR
