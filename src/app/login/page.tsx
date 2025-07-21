@@ -2,6 +2,7 @@ import { LoginForm } from "@/components/forms/login-form"
 import { ModeToggle } from "@/components/theme-toggle"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
     title: "Salkaro | Login",
@@ -29,7 +30,7 @@ export default function Login() {
                     <a href="#" className="flex items-center gap-2 font-medium">
                         <div className="text-primary-foreground flex size-6 items-center justify-center rounded-md">
                             <Avatar>
-                                <AvatarImage src="/logos/favicon-orange.svg" className="scale-80"/>
+                                <AvatarImage src="/logos/favicon-orange.svg" className="scale-80" />
                                 <AvatarFallback>SK</AvatarFallback>
                             </Avatar>
                         </div>
@@ -39,7 +40,9 @@ export default function Login() {
                 </div>
                 <div className="flex flex-1 items-center justify-center">
                     <div className="w-full max-w-xs">
-                        <LoginForm />
+                        <Suspense fallback={null}>
+                            <LoginForm />
+                        </Suspense>
                     </div>
                 </div>
             </div>
