@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
             },
         },
         csrfToken: {
-            name: isProd ? "__Host-next-auth.csrf-token" : "next-auth.csrf-token",
+            name: isProd ? "__Secure-next-auth.csrf-token" : "next-auth.csrf-token",
             options: {
                 httpOnly: true,
                 sameSite: "lax",
