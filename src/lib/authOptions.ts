@@ -24,6 +24,26 @@ export const authOptions: NextAuthOptions = {
                 domain: isProd ? ".salkaro.com" : undefined,
             },
         },
+        csrfToken: {
+            name: isProd ? "__Secure-next-auth.csrf-token" : "next-auth.csrf-token",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
+            },
+        },
+        callbackUrl: {
+            name: isProd ? "__Secure-next-auth.callback-url" : "next-auth.callback-url",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: isProd,
+                domain: isProd ? ".salkaro.com" : undefined,
+            },
+        },
     },
     providers: [
         CredentialsProvider({
