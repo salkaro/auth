@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
             name: isProd ? "__Secure-next-auth.session-token" : "next-auth.session-token",
             options: {
                 httpOnly: true,
-                sameSite: "None",
+                sameSite: "lax",
                 path: "/",
                 secure: isProd,
                 domain: isProd ? ".salkaro.com" : undefined,
